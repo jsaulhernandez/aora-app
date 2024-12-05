@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Image, ImageBackground, TouchableOpacity } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { ResizeMode, Video } from "expo-av";
@@ -41,6 +41,12 @@ const TrendingItem = ({
   //   }
   // }, [player, play]);
 
+  useEffect(() => {
+    if (activeItem !== item.$id) {
+      setPlay(false);
+    }
+  }, [activeItem, item.$id]);
+
   return (
     <Animatable.View
       className="mr-5"
@@ -50,7 +56,7 @@ const TrendingItem = ({
       {play ? (
         <Video
           source={{
-            uri: "https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4",
+            uri: item.video,
           }}
           className="w-52 h-72 rounded-[33px] mt-3 bg-white/10"
           style={{
