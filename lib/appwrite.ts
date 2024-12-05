@@ -166,6 +166,37 @@ export const getLatestPosts = async (): Promise<IPost[]> => {
 
     return convertMapDocuments<IPost>(posts.documents);
   } catch (error: any) {
+    console.error("Error get latests posts:", error);
+    throw new Error(error);
+  }
+};
+
+// Get video posts that matches search query
+export const searchPosts = async (query: string): Promise<IPost[]> => {
+  try {
+    const posts = await databases.listDocuments(databaseId, videoCollectionId, [
+      Query.search("title", query),
+    ]);
+
+    if (!posts) throw new Error("Something went wrong");
+
+    return convertMapDocuments<IPost>(posts.documents);
+  } catch (error: any) {
+    console.error("Error search posts:", error);
+    throw new Error(error);
+  }
+};
+
+// Get video posts created by user
+export const getUserPosts = async (userId: string): Promise<IPost[]> => {
+  try {
+    const posts = await databases.listDocuments(databaseId, videoCollectionId, [
+      Query.equal("creator", userId),
+    ]);
+
+    return convertMapDocuments<IPost>(posts.documents);
+  } catch (error: any) {
+    console.error("Error user posts:", error);
     throw new Error(error);
   }
 };
