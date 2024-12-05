@@ -1,6 +1,8 @@
 import { View, Text, Image } from "react-native";
 import { Redirect, Tabs } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+// components
+import Loader from "@/components/Loader";
 // constants
 import { icons } from "../../constants";
 // context
@@ -119,7 +121,7 @@ const TabsLayout = () => {
           }}
         />
       </Tabs>
-
+      <Loader isLoading={loading} />
       <StatusBar backgroundColor="#161622" style="light" />
     </>
   );
