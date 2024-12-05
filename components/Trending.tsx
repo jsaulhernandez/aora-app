@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { View, Text, FlatList } from "react-native";
+import { FlatList } from "react-native";
+// components
 import TrendingItem from "./TrendingItem";
+// interfaces
 import { IPost } from "@/data/interfaces/post.interface";
 
 const Trending = ({ posts }: { posts: IPost[] }) => {

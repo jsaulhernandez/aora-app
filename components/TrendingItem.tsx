@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Image, ImageBackground, TouchableOpacity } from "react-native";
 import * as Animatable from "react-native-animatable";
 import { ResizeMode, Video } from "expo-av";
