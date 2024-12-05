@@ -1,7 +1,10 @@
 import { View, Text, Image } from "react-native";
-import { Tabs } from "expo-router";
-
+import { Redirect, Tabs } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+// constants
 import { icons } from "../../constants";
+// context
+import { useGlobalContext } from "@/context/GlobalProvider";
 
 const TabIcon = ({
   icon,
@@ -34,6 +37,9 @@ const TabIcon = ({
 };
 
 const TabsLayout = () => {
+  const { loading, isLogged } = useGlobalContext();
+
+  if (!loading && !isLogged) return <Redirect href="/sign-in" />;
   return (
     <>
       <Tabs
@@ -113,6 +119,8 @@ const TabsLayout = () => {
           }}
         />
       </Tabs>
+
+      <StatusBar backgroundColor="#161622" style="light" />
     </>
   );
 };
