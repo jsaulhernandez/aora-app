@@ -17,3 +17,10 @@ export type FormFieldProps = {
   keyboardType?: KeyboardTypeOptions;
   typeInput?: "text" | "password";
 };
+
+export type InfoBoxProps = {
+  title: string;
+  subtitle?: string;
+  containerStyles?: string;
+  titleStyles?: string;
+};
