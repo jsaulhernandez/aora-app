@@ -12,7 +12,8 @@ import { ISignUp } from "@/data/interfaces/sign-up.interface";
 import { ISignIn } from "@/data/interfaces/sign-in.interface";
 import { IUser } from "@/data/interfaces/user.interface";
 // lib
-import { convertDocument } from "./converter";
+import { convertDocument, convertMapDocuments } from "./converter";
+import { IPost } from "@/data/interfaces/post.interface";
 
 export const config = {
   endpoint: "https://cloud.appwrite.io/v1",
@@ -24,13 +25,23 @@ export const config = {
   storageId: "6750dbbd00322ba7e1c0",
 };
 
+const {
+  endpoint,
+  platform,
+  projectId,
+  databaseId,
+  userCollectionId,
+  videoCollectionId,
+  storageId,
+} = config;
+
 // Init your React Native SDK
 const client = new Client();
 
 client
-  .setEndpoint(config.endpoint) // Your Appwrite Endpoint
-  .setProject(config.projectId) // Your project ID
-  .setPlatform(config.platform); // Your application ID or bundle ID.
+  .setEndpoint(endpoint) // Your Appwrite Endpoint
+  .setProject(projectId) // Your project ID
+  .setPlatform(platform); // Your application ID or bundle ID.
 
 const account = new Account(client);
 const storage = new Storage(client);
@@ -58,8 +69,8 @@ export const createUser = async ({
     await signIn({ email, password });
 
     const createdUser = await databases.createDocument(
-      config.databaseId,
-      config.userCollectionId,
+      databaseId,
+      userCollectionId,
       ID.unique(),
       {
         accountId: newAccount.$id,
@@ -119,8 +130,8 @@ export const getCurrentUser = async (): Promise<IUser | null> => {
     if (!currentAccount) throw Error;
 
     const currentUser = await databases.listDocuments(
-      config.databaseId,
-      config.userCollectionId,
+      databaseId,
+      userCollectionId,
       [Query.equal("accountId", currentAccount.$id)]
     );
 
@@ -130,5 +141,31 @@ export const getCurrentUser = async (): Promise<IUser | null> => {
   } catch (error) {
     console.error("Error get current user:", error);
     return null;
+  }
+};
+
+// Get all video Posts
+export const getAllPosts = async (): Promise<IPost[]> => {
+  try {
+    const posts = await databases.listDocuments(databaseId, videoCollectionId);
+
+    return convertMapDocuments<IPost>(posts.documents);
+  } catch (error: any) {
+    console.error("Error get all posts:", error);
+    throw new Error(error);
+  }
+};
+
+// Get latest created video posts
+export const getLatestPosts = async (): Promise<IPost[]> => {
+  try {
+    const posts = await databases.listDocuments(databaseId, videoCollectionId, [
+      Query.orderDesc("$createdAt"),
+      Query.limit(7),
+    ]);
+
+    return convertMapDocuments<IPost>(posts.documents);
+  } catch (error: any) {
+    throw new Error(error);
   }
 };
