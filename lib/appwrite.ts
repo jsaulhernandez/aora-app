@@ -4,6 +4,7 @@ import {
   Client,
   Databases,
   ID,
+  ImageGravity,
   Query,
   Storage,
 } from "react-native-appwrite";
@@ -200,3 +201,82 @@ export const getUserPosts = async (userId: string): Promise<IPost[]> => {
     throw new Error(error);
   }
 };
+
+// Create Video Post
+export async function createVideoPost(form: any) {
+  try {
+    const [thumbnailUrl, videoUrl] = await Promise.all([
+      uploadFile(form.thumbnail, "image"),
+      uploadFile(form.video, "video"),
+    ]);
+
+    const newPost = await databases.createDocument(
+      databaseId,
+      videoCollectionId,
+      ID.unique(),
+      {
+        title: form.title,
+        thumbnail: thumbnailUrl,
+        video: videoUrl,
+        prompt: form.prompt,
+        creator: form.userId,
+      }
+    );
+
+    return newPost;
+  } catch (error: any) {
+    console.error("Error create video post:", error);
+    throw new Error(error);
+  }
+}
+
+// Upload File
+export async function uploadFile(file: any, type: any) {
+  if (!file) return;
+
+  const { mimeType, ...rest } = file;
+  const asset = { type: mimeType, ...rest };
+
+  try {
+    const uploadedFile = await storage.createFile(
+      storageId,
+      ID.unique(),
+      asset
+    );
+
+    const fileUrl = await getFilePreview(uploadedFile.$id, type);
+    return fileUrl;
+  } catch (error: any) {
+    console.error("Error upload file:", error);
+    throw new Error(error);
+  }
+}
+
+// Get File Preview
+export async function getFilePreview(fileId: any, type: any) {
+  let fileUrl;
+
+  try {
+    if (type === "video") {
+      fileUrl = storage.getFileView(storageId, fileId);
+    } else if (type === "image") {
+      fileUrl = storage.getFilePreview(
+        storageId,
+        fileId,
+        2000,
+        2000,
+        ImageGravity.Top,
+        100
+      );
+    } else {
+      throw new Error("Invalid file type");
+    }
+
+    if (!fileUrl) throw Error;
+
+    return fileUrl;
+  } catch (error: any) {
+    console.error("Error get file preview:", error);
+    throw new Error(error);
+  }
+}
